@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import solarBG from "../assets/landingBG.jpg";
 import Navbar from "../components/navbar";
 import Button from "../compoundedComponent/Button";
 
 export default function LandingPage() {
+    const navigate = useNavigate();
   return (
     <div className="relative h-screen w-full flex flex-col">
        {/* Background Image */}
@@ -31,7 +33,7 @@ export default function LandingPage() {
         </p>
         <Button 
           text="Explore" 
-          onClick={() => {}} 
+          onClick={() => navigate("/home")} 
           className="mt-6 px-6 py-3 text-lg font-semibold bg-yellow-400 text-white rounded-lg shadow-md hover:bg-yellow-500 transition duration-300"
         />
       </div>

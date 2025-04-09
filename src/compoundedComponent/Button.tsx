@@ -11,7 +11,6 @@ type ButtonProps = {
 
 export default function Button({ text, onClick, className }: ButtonProps) {
     // Button styles
-    console.log(className)
     const buttonType = className?.includes("primary")
         ? "border-2 border-white text-white bg-transparent hover:bg-white hover:text-black cursor-pointer"
         : className?.includes("secondary")
