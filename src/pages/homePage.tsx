@@ -1,15 +1,25 @@
 import { useState } from "react";
 import Navbar from "../components/navbar";
+<<<<<<< HEAD
+=======
+import { IoSearch } from "react-icons/io5";
+>>>>>>> styling
 import { IoGrid } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaAngleDown } from "react-icons/fa";
+<<<<<<< HEAD
 import SearchBar from "../components/searchbar";
 import FilterBar from "../components/filterBar";
 import ListItem from "../components/listItem";
 
 export function GridAlignment() {
   const [viewType, setViewType] = useState("list"); 
+=======
+
+export function GridAlignment() {
+  const [viewType, setViewType] = useState("list"); // "list" or "grid"
+>>>>>>> styling
   
   return (
     <div className="flex items-center gap-3">
@@ -92,6 +102,66 @@ export function Location() {
   );
 }
 
+<<<<<<< HEAD
+=======
+function SearchBar() {
+  return (
+    <div className="flex items-center bg-gray-100 rounded-md px-3 h-10 w-full">
+      <input
+        type="text"
+        placeholder="Search for solar energy..."
+        className="flex-grow bg-transparent focus:outline-none text-sm"
+      />
+      <IoSearch className="text-gray-500" size={18} />
+    </div>
+  );
+}
+
+function FilterBar() {
+  return (
+    <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg my-4">
+      <div className="flex items-center gap-3">
+        <span className="font-semibold text-blue-800 text-sm">Filters:</span>
+        <div className="flex gap-2">
+          <button className="px-4 py-1 bg-white border border-blue-300 rounded-full text-sm text-blue-800">Price</button>
+          <button className="px-4 py-1 bg-white border border-blue-300 rounded-full text-sm text-blue-800">Capacity</button>
+          <button className="px-4 py-1 bg-white border border-blue-300 rounded-full text-sm text-blue-800">Distance</button>
+          <button className="px-4 py-1 bg-white border border-blue-300 rounded-full text-sm text-blue-800">Rating</button>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-blue-800 text-sm">Sort by:</span>
+        <span className="font-semibold text-blue-800 text-sm">Price ▼</span>
+      </div>
+    </div>
+  );
+}
+
+function ListItem({ name, address, pricePerKwh, availableKwh }) {
+  return (
+    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg mb-3 bg-white">
+      <div className="flex items-center gap-4">
+        <div className="bg-blue-600 p-2 rounded-full w-10 h-10 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4V20M4 12H20" stroke="white" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="font-bold text-blue-900">{name}</h3>
+          <p className="text-gray-500 text-sm">{address}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm">Contact</button>
+        <div className="text-right">
+          <p className="font-bold text-blue-900">${pricePerKwh}/kWh</p>
+          <p className="text-gray-500 text-sm">{availableKwh.toLocaleString()} kWh</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+>>>>>>> styling
 
 export default function HomePage() {
   const listings = [
