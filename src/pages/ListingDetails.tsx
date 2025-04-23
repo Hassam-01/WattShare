@@ -197,10 +197,10 @@ const ListingDetails = () => {
                   </div>
                   <div>
                     <p className="font-medium">
-                      {listing.profiles.first_name} {listing.profiles.last_name}
+                      {listing.profiles?.first_name} {listing.profiles?.last_name}
                     </p>
                     <p className="text-sm text-muted-foreground capitalize">
-                      {listing.profiles.user_type}
+                      {listing.profiles?.user_type}
                     </p>
                   </div>
                 </div>
