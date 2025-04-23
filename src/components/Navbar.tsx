@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Sun, User, LogOut, Package, LayoutDashboard, MessageSquare } from "lucide-react";
+import {
+  Menu,
+  X,
+  Sun,
+  User,
+  LogOut,
+  Package,
+  LayoutDashboard,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -21,16 +30,16 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const { data: unreadCount = 0 } = useQuery({
-    queryKey: ['unread-messages'],
+    queryKey: ["unread-messages"],
     queryFn: async () => {
       if (!authState.user?.id) return 0;
-      
+
       const { count, error } = await supabase
-        .from('messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('receiver_id', authState.user.id)
-        .eq('is_read', false);
-      
+        .from("messages")
+        .select("*", { count: "exact", head: true })
+        .eq("receiver_id", authState.user.id)
+        .eq("is_read", false);
+
       if (error) throw error;
       return count || 0;
     },
@@ -44,12 +53,12 @@ const Navbar = () => {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/');
+    navigate("/");
   };
 
   const getInitials = () => {
-    const firstName = authState.profile?.first_name || '';
-    const lastName = authState.profile?.last_name || '';
+    const firstName = authState.profile?.first_name || "";
+    const lastName = authState.profile?.last_name || "";
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
@@ -60,29 +69,43 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <Sun className="h-8 w-8 text-solar-yellow mr-2" />
-              <span className="text-2xl font-bold text-solar-darkblue">WattShare</span>
+              <span className="text-2xl font-bold text-solar-darkblue">
+                WattShare
+              </span>
             </Link>
           </div>
-          
+
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-solar-blue transition-colors">
+            <Link
+              to="/"
+              className="text-gray-700 hover:text-solar-blue transition-colors"
+            >
               Home
             </Link>
-            <Link to="/explore" className="text-gray-700 hover:text-solar-blue transition-colors">
+            <Link
+              to="/explore"
+              className="text-gray-700 hover:text-solar-blue transition-colors"
+            >
               Explore
             </Link>
-            <Link to="/saved" className="text-gray-700 hover:text-solar-blue transition-colors">
+            <Link
+              to="/saved"
+              className="text-gray-700 hover:text-solar-blue transition-colors"
+            >
               Saved Deals
             </Link>
-            <Link to="/about" className="text-gray-700 hover:text-solar-blue transition-colors">
+            <Link
+              to="/about"
+              className="text-gray-700 hover:text-solar-blue transition-colors"
+            >
               About Us
             </Link>
-            
+
             {authState.user && (
               <Button
                 variant="ghost"
-                className="relative"
-                onClick={() => navigate('/messages')}
+                className="relative text-black dark:text-black"
+                onClick={() => navigate("/messages")}
               >
                 <MessageSquare className="h-5 w-5" />
                 {unreadCount > 0 && (
@@ -92,7 +115,7 @@ const Navbar = () => {
                 )}
               </Button>
             )}
-            
+
             {authState.user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -104,32 +127,44 @@ const Navbar = () => {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to={`/user/${authState.user.id}`} className="flex items-center cursor-pointer w-full">
+                    <Link
+                      to={`/user/${authState.user.id}`}
+                      className="flex items-center cursor-pointer w-full"
+                    >
                       <User className="h-4 w-4 mr-2" />
                       Profile
                     </Link>
                   </DropdownMenuItem>
-                  
-                  {authState.profile?.user_type === 'seller' && (
+
+                  {authState.profile?.user_type === "seller" && (
                     <DropdownMenuItem asChild>
-                      <Link to="/seller/dashboard" className="flex items-center cursor-pointer w-full">
+                      <Link
+                        to="/seller/dashboard"
+                        className="flex items-center cursor-pointer w-full"
+                      >
                         <LayoutDashboard className="h-4 w-4 mr-2" />
                         Seller Dashboard
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  
-                  {authState.profile?.user_type === 'customer' && (
+
+                  {authState.profile?.user_type === "customer" && (
                     <DropdownMenuItem asChild>
-                      <Link to="/purchases" className="flex items-center cursor-pointer w-full">
+                      <Link
+                        to="/purchases"
+                        className="flex items-center cursor-pointer w-full"
+                      >
                         <Package className="h-4 w-4 mr-2" />
                         My Purchases
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  
+
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={handleSignOut}
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     Log out
                   </DropdownMenuItem>
@@ -137,16 +172,16 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => navigate('/auth')}>
+                <Button variant="outline" onClick={() => navigate("/auth")}>
                   Sign In
                 </Button>
-                <Button onClick={() => navigate('/auth?tab=signup')}>
+                <Button onClick={() => navigate("/auth?tab=signup")}>
                   Sign Up
                 </Button>
               </div>
             )}
           </div>
-          
+
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
@@ -193,7 +228,7 @@ const Navbar = () => {
             >
               About Us
             </Link>
-            
+
             {authState.user ? (
               <>
                 <Link
@@ -203,8 +238,8 @@ const Navbar = () => {
                 >
                   Profile
                 </Link>
-                
-                {authState.profile?.user_type === 'seller' && (
+
+                {authState.profile?.user_type === "seller" && (
                   <Link
                     to="/seller/dashboard"
                     className="block px-3 py-2 rounded-md text-gray-700 hover:bg-solar-lightgray"
@@ -213,8 +248,8 @@ const Navbar = () => {
                     Seller Dashboard
                   </Link>
                 )}
-                
-                {authState.profile?.user_type === 'customer' && (
+
+                {authState.profile?.user_type === "customer" && (
                   <Link
                     to="/purchases"
                     className="block px-3 py-2 rounded-md text-gray-700 hover:bg-solar-lightgray"
@@ -223,7 +258,7 @@ const Navbar = () => {
                     My Purchases
                   </Link>
                 )}
-                
+
                 <button
                   onClick={() => {
                     handleSignOut();
@@ -236,20 +271,20 @@ const Navbar = () => {
               </>
             ) : (
               <div className="pt-2 space-y-2">
-                <Button 
-                  variant="outline" 
-                  className="w-full" 
+                <Button
+                  variant="outline"
+                  className="w-full"
                   onClick={() => {
-                    navigate('/auth');
+                    navigate("/auth");
                     toggleMenu();
                   }}
                 >
                   Sign In
                 </Button>
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   onClick={() => {
-                    navigate('/auth?tab=signup');
+                    navigate("/auth?tab=signup");
                     toggleMenu();
                   }}
                 >
