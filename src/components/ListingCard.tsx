@@ -3,7 +3,11 @@ import { useState } from "react";
 import { Bookmark, MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { toast as toast2 } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ListingCardProps {
   id: string;
@@ -15,7 +19,6 @@ interface ListingCardProps {
   rating: number;
   isSaved?: boolean;
 }
-
 const ListingCard = ({
   id,
   title,
@@ -28,20 +31,36 @@ const ListingCard = ({
 }: ListingCardProps) => {
   const [saved, setSaved] = useState(isSaved);
   const navigate = useNavigate();
-
+  
   const toggleSave = (e) => {
     e.stopPropagation();
+    handleSaveListing()
     setSaved(!saved);
     toast({
       title: !saved ? "Listing saved!" : "Listing removed from saved",
       description: !saved ? "You can find this in your saved deals." : "This listing has been removed from your saved deals.",
     });
   };
-
+  
   const handleViewDeal = () => {
     navigate(`/listing/${id}`);
   };
+  const { authState } = useAuth();
 
+  const handleSaveListing = async () => {
+    if (!authState.user) {
+      toast2.info("Please sign in to save listings");
+      return;
+    }
+    const { data, error } = await supabase
+      .from("saved_listings")
+      .upsert({ listing_id: id, user_id: authState.user.id })
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+  
   return (
     <div className="solar-card group cursor-pointer" onClick={handleViewDeal}>
       <div className="relative overflow-hidden">
