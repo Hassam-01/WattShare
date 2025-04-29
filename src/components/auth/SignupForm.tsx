@@ -45,12 +45,6 @@ const SignupForm = () => {
   const onSubmit = async (data: SignupFormValues) => {
     setIsLoading(true);
     try {
-      console.log('Submitting signup with data:', {
-        email: data.email,
-        userType: data.userType,
-        firstName: data.firstName,
-        lastName: data.lastName
-      });
       
       // Ensure userType is one of the expected values
       const userType = data.userType === 'customer' ? 'customer' : 'seller';
@@ -64,8 +58,7 @@ const SignupForm = () => {
           userType: userType as 'customer' | 'seller'
         }
       );
-      toast.success('Account created successfully! Please check your email for verification.');
-      navigate('/login');
+      // navigate('/login');
     } catch (error: any) {
       console.error('Signup error:', error);
       toast.error(error.message || 'Failed to create account');
