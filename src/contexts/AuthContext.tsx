@@ -14,7 +14,7 @@ const initialState: AuthState = {
 
 export const AuthContext = createContext<{
   authState: AuthState;
-  signUp: (email: string, password: string, userData: { first_name: string; last_name: string; userType: 'customer' | 'seller' }) => Promise<void>;
+  signUp: (email: string, password: string, userData: { first_name: string; last_name: string; user_type: 'customer' | 'seller' }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<Profile>) => Promise<void>;
@@ -55,13 +55,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Set up auth state listener FIRST
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
-          console.log('Auth state changed:', event, session?.user?.id);
           setAuthState(prev => ({ ...prev, session, user: session?.user ?? null }));
           
           if (session?.user) {
             setTimeout(async () => {
               const profile = await fetchProfile(session.user.id);
-              console.log('Fetched profile:', profile);
               setAuthState(prev => ({ ...prev, profile, isLoading: false }));
             }, 0);
           } else {
@@ -92,14 +90,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (
     email: string, 
     password: string, 
-    userData: { first_name: string; last_name: string; userType: string }
+    userData: { first_name: string; last_name: string; userType: 'customer' | 'seller' }
   ) => {
     try {
-      console.log('Sign up data:', { email, userData });
       
       // Ensure the user_type is a string
-      // const user_type = userData.user_type.toString();
-      
+      const user_type = userData.userType.toString();
       const { error, data } = await supabase.auth.signUp({
         email,
         password,
@@ -107,17 +103,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           data: {
             first_name: userData.first_name,
             last_name: userData.last_name,
-            userType: userData.userType,
+            user_type: user_type,
           },
         },
       });
-
       if (error) {
         console.error('Signup error:', error);
         throw error;
       }
       
-      console.log('Signup success:', data);
       toast.success('Account created successfully! Please check your email for verification.');
     } catch (error: any) {
       console.error('Error in signUp function:', error);
