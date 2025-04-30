@@ -1,26 +1,45 @@
-
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
-import { UserType } from '@/types/auth';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { UserType } from "@/types/auth";
+import { toast } from "sonner";
 
 const signupSchema = z.object({
-  firstName: z.string().min(2, { message: 'First name must be at least 2 characters' }),
-  lastName: z.string().min(2, { message: 'Last name must be at least 2 characters' }),
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-  userType: z.enum(['customer', 'seller'], {
-    required_error: 'Please select a user type',
+  firstName: z
+    .string()
+    .min(2, { message: "First name must be at least 2 characters" }),
+  lastName: z
+    .string()
+    .min(2, { message: "Last name must be at least 2 characters" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" }),
+  userType: z.enum(["customer", "seller"], {
+    required_error: "Please select a user type",
   }),
 });
 
@@ -34,10 +53,10 @@ const SignupForm = () => {
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
       userType: undefined,
     },
   });
@@ -45,23 +64,18 @@ const SignupForm = () => {
   const onSubmit = async (data: SignupFormValues) => {
     setIsLoading(true);
     try {
-      
       // Ensure userType is one of the expected values
-      const userType = data.userType === 'customer' ? 'customer' : 'seller';
-      
-      await signUp(
-        data.email, 
-        data.password, 
-        { 
-          first_name: data.firstName, 
-          last_name: data.lastName, 
-          user_type: userType as 'customer' | 'seller'
-        }
-      );
+      const userType = data.userType === "customer" ? "customer" : "seller";
+
+      await signUp(data.email, data.password, {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        userType: userType as "customer" | "seller",
+      });
       // navigate('/login');
     } catch (error: any) {
-      console.error('Signup error:', error);
-      toast.error(error.message || 'Failed to create account');
+      console.error("Signup error:", error);
+      toast.error(error.message || "Failed to create account");
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +127,12 @@ const SignupForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="you@example.com" {...field} type="email" autoComplete="email" />
+                    <Input
+                      placeholder="you@example.com"
+                      {...field}
+                      type="email"
+                      autoComplete="email"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,7 +145,12 @@ const SignupForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="••••••••" {...field} type="password" autoComplete="new-password" />
+                    <Input
+                      placeholder="••••••••"
+                      {...field}
+                      type="password"
+                      autoComplete="new-password"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -167,15 +191,18 @@ const SignupForm = () => {
               )}
             />
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? "Creating account..." : "Create Account"}
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
-          Already have an account?{' '}
-          <Link to="/login" className="text-primary underline underline-offset-4">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-primary underline underline-offset-4"
+          >
             Sign in
           </Link>
         </p>
