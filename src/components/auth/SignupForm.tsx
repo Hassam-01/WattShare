@@ -55,7 +55,7 @@ const SignupForm = () => {
         { 
           first_name: data.firstName, 
           last_name: data.lastName, 
-          userType: userType as 'customer' | 'seller'
+          user_type: userType as 'customer' | 'seller'
         }
       );
       // navigate('/login');
