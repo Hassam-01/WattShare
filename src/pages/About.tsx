@@ -19,15 +19,17 @@ const teamMembers = [
     name: "Hassam Ali",
     role: "Founder & CEO",
     description: "Passionate about renewable energy and innovation.",
-    image: "https://i.ibb.co/Ps7mKcvs/Whats-App-Image-2025-04-30-at-03-30-55-578e531c.jpghttps://i.ibb.co/gbgKPzPw/MEE22.jpg",
+    image:
+      "https://i.ibb.co/Ps7mKcvs/Whats-App-Image-2025-04-30-at-03-30-55-578e531c.jpghttps://i.ibb.co/gbgKPzPw/MEE22.jpg",
   },
   {
     id: 2,
     name: "Adeena Reeham",
     role: "Chief Technology Officer",
     description: "Expert in solar technology and system design.",
-    image: "/api/placeholder/150/150",
+    image: " https://i.ibb.co/8DDNh9kP/IMG-20241207-WA0020.jpg",
   },
+
   {
     id: 3,
     name: "Shahzaib",
@@ -44,7 +46,8 @@ const AboutUs = () => {
     // Apply theme class to document body
     document.body.classList.toggle("dark", theme === "dark");
     // Set background color based on theme
-    document.body.style.backgroundColor = theme === "dark" ? "#111827" : "#ffffff";
+    document.body.style.backgroundColor =
+      theme === "dark" ? "#111827" : "#ffffff";
   }, [theme]);
 
   const toggleTheme = () => {
@@ -60,24 +63,22 @@ const AboutUs = () => {
           <div className="flex justify-center mb-6">
             <Sun className="h-16 w-16 text-yellow-400 animate-pulse" />
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            WattShare
-          </h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">WattShare</h1>
           <p className="text-xl max-w-3xl mx-auto">
             Connecting solar enthusiasts and making sustainable energy more
             accessible for everyone.
           </p>
         </div>
-        
+
         {/* Wave SVG with deeper curve */}
         <div className="absolute bottom-0 left-0 right-0 w-full">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 1440 320" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1440 320"
             className="w-full"
             preserveAspectRatio="none"
           >
-            <path 
+            <path
               fill="currentColor"
               fillOpacity="1"
               className="text-gray-900 dark:text-gray-900"
@@ -92,7 +93,9 @@ const AboutUs = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Our Mission</h2>
+              <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+                Our Mission
+              </h2>
               <p className="text-lg mb-6 text-gray-800 dark:text-gray-300">
                 At WattShare, we believe that sustainable energy should be
                 accessible to everyone. Our mission is to create a vibrant
@@ -148,7 +151,9 @@ const AboutUs = () => {
               />
             </div>
             <div className="order-1 md:order-2">
-              <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Our Story</h2>
+              <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+                Our Story
+              </h2>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
                 WattShare was founded in 2025 by a group of solar enthusiasts
                 who recognized a gap in the market. While searching for
@@ -179,7 +184,9 @@ const AboutUs = () => {
               <div className="bg-yellow-400 inline-flex rounded-full p-3 mb-4">
                 <ShieldCheck className="h-8 w-8 text-purple-900" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">Trust & Safety</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+                Trust & Safety
+              </h3>
               <p className="text-gray-700 dark:text-gray-300">
                 We prioritize creating a secure marketplace with verified users
                 and secure transactions to protect our community.
@@ -190,7 +197,9 @@ const AboutUs = () => {
               <div className="bg-green-600 dark:bg-green-500 inline-flex rounded-full p-3 mb-4">
                 <Leaf className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">Sustainability</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+                Sustainability
+              </h3>
               <p className="text-gray-700 dark:text-gray-300">
                 Every transaction on WattShare contributes to a more sustainable
                 future by extending the life of solar products.
@@ -201,7 +210,9 @@ const AboutUs = () => {
               <div className="bg-purple-700 inline-flex rounded-full p-3 mb-4">
                 <Users className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">Community</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+                Community
+              </h3>
               <p className="text-gray-700 dark:text-gray-300">
                 We foster a supportive community where knowledge is shared and
                 solar adoption is encouraged.
@@ -212,7 +223,9 @@ const AboutUs = () => {
               <div className="bg-purple-900 inline-flex rounded-full p-3 mb-4">
                 <BarChart4 className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">Transparency</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+                Transparency
+              </h3>
               <p className="text-gray-700 dark:text-gray-300">
                 We believe in clear, honest communication about product
                 conditions, pricing, and marketplace operations.
@@ -223,7 +236,9 @@ const AboutUs = () => {
               <div className="bg-yellow-400 inline-flex rounded-full p-3 mb-4">
                 <Sun className="h-8 w-8 text-purple-900" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">Innovation</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+                Innovation
+              </h3>
               <p className="text-gray-700 dark:text-gray-300">
                 We continuously improve our platform to better serve the
                 evolving needs of the solar community.
@@ -234,7 +249,9 @@ const AboutUs = () => {
               <div className="bg-purple-700 inline-flex rounded-full p-3 mb-4">
                 <MessageSquare className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">Education</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+                Education
+              </h3>
               <p className="text-gray-700 dark:text-gray-300">
                 We're committed to helping people learn about solar energy
                 through resources, guides, and community support.
@@ -253,21 +270,27 @@ const AboutUs = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {teamMembers.map((member) => (
-                <div
+              <div
                 key={member.id}
                 className="bg-white dark:bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-                >
+              >
                 <img
                   src={member.image}
                   alt={member.name}
                   className="w-full h-64 object-cover object-center"
                 />
                 <div className="p-4">
-                  <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-gray-100">{member.name}</h3>
-                  <p className="text-purple-700 dark:text-purple-400 mb-2">{member.role}</p>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">{member.description}</p>
+                  <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-gray-100">
+                    {member.name}
+                  </h3>
+                  <p className="text-purple-700 dark:text-purple-400 mb-2">
+                    {member.role}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                    {member.description}
+                  </p>
                 </div>
-                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -282,7 +305,7 @@ const AboutUs = () => {
           <div className="absolute bottom-32 left-1/4 w-16 h-16 rounded-full bg-purple-400"></div>
           <div className="absolute top-24 right-1/4 w-20 h-20 rounded-full bg-purple-400"></div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Join Our Mission
@@ -314,7 +337,9 @@ const AboutUs = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
-              <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Get in Touch</h2>
+              <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+                Get in Touch
+              </h2>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
                 Have questions, suggestions, or feedback? We'd love to hear from
                 you. Fill out the form or use our contact information below.
@@ -339,8 +364,12 @@ const AboutUs = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Phone</h3>
-                    <p className="text-gray-600 dark:text-gray-400">(555) 123-4567</p>
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
+                      Phone
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      (555) 123-4567
+                    </p>
                   </div>
                 </div>
 
@@ -362,8 +391,12 @@ const AboutUs = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Email</h3>
-                    <p className="text-gray-600 dark:text-gray-400">info@wattshare.com</p>
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
+                      Email
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      info@wattshare.com
+                    </p>
                   </div>
                 </div>
 
@@ -391,9 +424,15 @@ const AboutUs = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Address</h3>
-                    <p className="text-gray-600 dark:text-gray-400">CR-22 Rimms building</p>
-                    <p className="text-gray-600 dark:text-gray-400">NUST-h12 sector Islamabad</p>
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
+                      Address
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      CR-22 Rimms building
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      NUST-h12 sector Islamabad
+                    </p>
                   </div>
                 </div>
               </div>
