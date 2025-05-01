@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Bookmark, MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useSaveListing } from "@/hooks/useListingMutations";
 
 interface ListingCardProps {
   id: string;
@@ -29,38 +29,53 @@ const ListingCard = ({
   rating,
   isSaved = false,
 }: ListingCardProps) => {
+  const { authState } = useAuth();
   const [saved, setSaved] = useState(isSaved);
   const navigate = useNavigate();
-  
+  const {mutate: saveListing} = useSaveListing();
   const toggleSave = (e) => {
     e.stopPropagation();
-    handleSaveListing()
+    // handleSaveListing();
     setSaved(!saved);
     toast({
       title: !saved ? "Listing saved!" : "Listing removed from saved",
-      description: !saved ? "You can find this in your saved deals." : "This listing has been removed from your saved deals.",
+      description: !saved
+        ? "You can find this in your saved deals."
+        : "This listing has been removed from your saved deals.",
     });
+    saveListing({
+      listingId: id,
+      userId: authState.user?.id,
+      isSaved: saved,
+    });
+    
   };
-  
   const handleViewDeal = () => {
     navigate(`/listing/${id}`);
   };
-  const { authState } = useAuth();
 
-  const handleSaveListing = async () => {
-    if (!authState.user) {
-      toast2.info("Please sign in to save listings");
-      return;
-    }
-    const { data, error } = await supabase
-      .from("saved_listings")
-      .upsert({ listing_id: id, user_id: authState.user.id })
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-  
+  // const handleSaveListing = async () => {
+  //   if (!authState.user) {
+  //     toast2.info("Please sign in to save listings");
+  //     return;
+  //   }
+  //   if (!saved) {
+  //     const { data, error } = await supabase
+  //       .from("saved_listings")
+  //       .upsert({ listing_id: id, user_id: authState.user.id })
+  //       .single();
+  //     if (error) throw error;
+  //     return data;
+  //   } else {
+  //     const { error } = await supabase
+  //       .from("saved_listings")
+  //       .delete()
+  //       .eq("listing_id", id)
+  //       .eq("user_id", authState.user.id);
+  //     if (error) throw error;
+  //   }
+  // };
+
   return (
     <div className="solar-card group cursor-pointer" onClick={handleViewDeal}>
       <div className="relative overflow-hidden">
@@ -94,15 +109,19 @@ const ListingCard = ({
             <Star
               key={i}
               className={`h-4 w-4 ${
-                i < rating ? "text-solar-yellow fill-solar-yellow" : "text-gray-300"
+                i < rating
+                  ? "text-solar-yellow fill-solar-yellow"
+                  : "text-gray-300"
               }`}
             />
           ))}
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xl font-bold text-solar-darkblue">${price.toLocaleString()}</span>
-          <Button 
-            variant="outline" 
+          <span className="text-xl font-bold text-solar-darkblue">
+            ${price.toLocaleString()}
+          </span>
+          <Button
+            variant="outline"
             className="border-solar-blue text-solar-blue hover:bg-solar-blue hover:text-white"
             onClick={(e) => {
               e.stopPropagation();

@@ -13,7 +13,7 @@ const SavedDeals = () => {
   const { authState } = useAuth();
   const navigate = useNavigate();
 
-  const { data: savedListings, isLoading } = useQuery({
+  const { data: savedListings, isLoading, error } = useQuery({
     queryKey: ["user-saved-listings", authState.user?.id],
     queryFn: async () => {
       if (!authState.user) return [];
