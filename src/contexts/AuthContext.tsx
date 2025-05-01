@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     initializeAuth();
   }, []);
-
+  
   const signUp = async (
     email: string,
     password: string,
@@ -124,6 +124,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   ) => {
     try {
+      // createSellerUsers(); // Uncomment this line to create sellers bulk entry
       // Ensure the user_type is a string
       const user_type = userData.userType.toString();
       const { error, data } = await supabase.auth.signUp({
@@ -151,6 +152,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
+
+  
+  async function createSellerUsers() {
+  const pakistaniFirstNames = [
+    'Zayan', 'Rameez', 'Taimoor', 'Shahmeer', 'Ehsan', 'Feroz', 'Nabeel', 'Rafay',
+    'Zohair', 'Aariz', 'Daniyal', 'Shayan', 'Ayaan', 'Rehan', 'Saif',
+    'Aleena', 'Mahnoor', 'Eshal', 'Anaya', 'Zarish', 'Hoorain', 'Minahil',
+    'Aqsa', 'Ifrah', 'Zimal', 'Areej', 'Mahira', 'Saharish', 'Nashit', 'Tazeen',
+    'Arham', 'Shafay', 'Faris', 'Zavian', 'Nashit', 'Zeeshan', 'Irtaza', 'Jibran',
+    'Mehreen', 'Sabeen', 'Nayab', 'Rimsha', 'Sehrish', 'Anabia', 'Hafiza', 'Iqrah',
+    'Eshaal', 'Laibah', 'Mahveen', 'Sundus', 'Zohra', 'Areesha', 'Hooria', 'Saniyah'
+  ];
+
+  const pakistaniLastNames = [
+    'Alamgir', 'Bukhari', 'Chishti', 'Darvesh', 'Ehtisham', 'Fazal', 'Gulzar', 'Hashwani',
+    'Ishtiaq', 'Jahangir', 'Kashif', 'Lodhi', 'Mansoor', 'Nizami', 'Owais',
+    'Paracha', 'Qadir', 'Rafique', 'Sarmad', 'Tariq', 'Usmani', 'Virk', 'Waseem',
+    'Yasir', 'Zuberi', 'Awan', 'Bajwa', 'Chaudhary', 'Durrani', 'Faridi',
+    'Ghaffar', 'Hameed', 'Iqbal', 'Jalal', 'Khanum', 'Latif', 'Mumtaz', 'Naeem',
+    'Pirzada', 'Qureshi', 'Rasheed', 'Siddiqi', 'Tirmizi', 'Ullah', 'Wajid', 'Younus',
+    'Zahid', 'Abbasi', 'Bhatti', 'Rajput', 'Ghauri', 'Afridi', 'Mehmood', 'Kazmi'
+  ];
+    const totalSellers = 1000;
+    const startFrom = 264; 
+    
+    for (let i = startFrom; i < startFrom + totalSellers; i++) {
+      const firstName = pakistaniFirstNames[Math.floor(Math.random() * pakistaniFirstNames.length)];
+      const lastName = pakistaniLastNames[Math.floor(Math.random() * pakistaniLastNames.length)];
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: `seller${i}@example.com`, 
+        password: 'hello123',
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            user_type: 'seller',  
+          },
+        },
+      });
+  
+      if (error) {
+        console.error(`Error creating seller ${i}:`, error.message);
+      } else {
+        console.log(`Created SELLER: ${firstName} ${lastName} (${data.user.email})`);
+      }
+  
+      // Increased delay to 300ms for bulk creation
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+  }
+  
 
   const signIn = async (email: string, password: string) => {
     try {
