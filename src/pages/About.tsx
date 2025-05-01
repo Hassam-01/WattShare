@@ -42,7 +42,7 @@ const teamMembers = [
 ];
 
 const AboutUs = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme} = useTheme();
 
   useEffect(() => {
     // Apply theme class to document body
@@ -51,10 +51,6 @@ const AboutUs = () => {
     document.body.style.backgroundColor =
       theme === "dark" ? "#111827" : "#ffffff";
   }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
