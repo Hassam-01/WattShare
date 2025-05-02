@@ -10,6 +10,7 @@ import {
   Bookmark,
   Star,
   X,
+  Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -39,11 +40,11 @@ import {
 const Explore = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [category, setCategory] = useState("all");
+
   const [condition, setCondition] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState("grid");
-  const [selectedListing, setSelectedListing] = useState<any>(null);
+  const [selectedListing, setSelectedListing] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const { data: listings = [], isLoading } = useQuery({
@@ -101,11 +102,20 @@ const Explore = () => {
       }
     });
 
-  const handleMessage = (listingId: string) => {
+  const handleViewDeal = (listing) => {
+    navigate(`/listing/${listing.id}`);
+  };
+
+  const openDetailsModal = (listing) => {
+    setSelectedListing(listing);
+    setShowDetailsModal(true);
+  };
+
+  const handleMessage = (listingId) => {
     navigate(`/contact/${listingId}`);
   };
 
-  const handleMakeDeal = (listingId: string) => {
+  const handleMakeDeal = (listingId) => {
     navigate(`/contact/${listingId}`);
   };
 
@@ -142,19 +152,6 @@ const Explore = () => {
             </div>
 
             <div className="flex flex-wrap gap-4 items-center">
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-[180px] bg-white/80 dark:bg-gray-800 border-indigo-200 dark:border-indigo-700">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-800 border-indigo-200 dark:border-indigo-700">
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="panels">Solar Panels</SelectItem>
-                  <SelectItem value="batteries">Batteries</SelectItem>
-                  <SelectItem value="inverters">Inverters</SelectItem>
-                  <SelectItem value="systems">Complete Systems</SelectItem>
-                </SelectContent>
-              </Select>
-
               <Select value={condition} onValueChange={setCondition}>
                 <SelectTrigger className="w-[180px] bg-white/80 dark:bg-gray-800 border-indigo-200 dark:border-indigo-700">
                   <SelectValue placeholder="Condition" />
@@ -251,7 +248,7 @@ const Explore = () => {
               <Button
                 onClick={() => {
                   setSearchTerm("");
-                  setCategory("all");
+
                   setCondition("all");
                 }}
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
@@ -272,18 +269,27 @@ const Explore = () => {
                     </Badge>
                   )}
                   <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200 border border-indigo-100 dark:border-indigo-900/30">
-                    <div className="h-48 overflow-hidden">
+                    <div
+                      className="h-48 overflow-hidden relative"
+                      onClick={() => openDetailsModal(listing)}
+                    >
                       <img
                         src={
                           listing.listing_images?.[0]?.image_url ||
                           "/placeholder.svg"
                         }
                         alt={listing.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 cursor-pointer"
                       />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 flex items-center justify-center transition-all duration-300">
+                        <Eye className="text-white opacity-0 group-hover:opacity-100 h-8 w-8 transition-opacity duration-300" />
+                      </div>
                     </div>
                     <div className="p-6">
-                      <h3 className="font-bold text-lg mb-2 text-indigo-900 dark:text-indigo-100">
+                      <h3
+                        className="font-bold text-lg mb-2 text-indigo-900 dark:text-indigo-100 cursor-pointer"
+                        onClick={() => openDetailsModal(listing)}
+                      >
                         {listing.title}
                       </h3>
                       <div className="flex items-center mb-2 text-indigo-600 dark:text-indigo-300">
@@ -306,12 +312,24 @@ const Explore = () => {
                         <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700 dark:from-indigo-400 dark:to-purple-400">
                           ${listing.price.toLocaleString()}
                         </span>
-                        <Button
-                          variant="outline"
-                          className="border-indigo-600 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:border-indigo-400 dark:text-indigo-300 dark:hover:bg-indigo-600 dark:hover:text-white transition-colors duration-200"
-                        >
-                          View Deal
-                        </Button>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openDetailsModal(listing)}
+                            className="border-indigo-300 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-800/30"
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Preview
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => handleViewDeal(listing)}
+                            className="border-indigo-600 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:border-indigo-400 dark:text-indigo-300 dark:hover:bg-indigo-600 dark:hover:text-white transition-colors duration-200"
+                          >
+                            View Deal
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -332,7 +350,10 @@ const Explore = () => {
                   )}
                   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 overflow-hidden border border-indigo-100 dark:border-indigo-900/30">
                     <div className="flex flex-col md:flex-row">
-                      <div className="w-full md:w-1/3 h-56 relative overflow-hidden">
+                      <div
+                        className="w-full md:w-1/3 h-56 relative overflow-hidden cursor-pointer"
+                        onClick={() => openDetailsModal(listing)}
+                      >
                         <img
                           src={
                             listing.listing_images?.[0]?.image_url ||
@@ -341,10 +362,16 @@ const Explore = () => {
                           alt={listing.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 flex items-center justify-center transition-all duration-300">
+                          <Eye className="text-white opacity-0 group-hover:opacity-100 h-8 w-8 transition-opacity duration-300" />
+                        </div>
                       </div>
                       <div className="p-6 flex-grow flex flex-col justify-between">
                         <div>
-                          <h3 className="font-bold text-xl mb-2 text-indigo-900 dark:text-indigo-100">
+                          <h3
+                            className="font-bold text-xl mb-2 text-indigo-900 dark:text-indigo-100 cursor-pointer"
+                            onClick={() => openDetailsModal(listing)}
+                          >
                             {listing.title}
                           </h3>
                           <div className="flex items-center mb-3 text-indigo-600 dark:text-indigo-300">
@@ -371,9 +398,22 @@ const Explore = () => {
                           <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700 dark:from-indigo-400 dark:to-purple-400">
                             ${listing.price.toLocaleString()}
                           </span>
-                          <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-200">
-                            View Deal
-                          </Button>
+                          <div className="flex space-x-3">
+                            <Button
+                              variant="outline"
+                              onClick={() => openDetailsModal(listing)}
+                              className="border-indigo-300 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-800/30"
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Preview
+                            </Button>
+                            <Button
+                              onClick={() => handleViewDeal(listing)}
+                              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                            >
+                              View Deal
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -387,7 +427,7 @@ const Explore = () => {
 
       {/* Details Modal */}
       <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gray-800 border border-indigo-100 dark:border-indigo-900/50 rounded-xl shadow-xl">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border border-indigo-100 dark:border-indigo-900/50 rounded-xl shadow-xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-indigo-900 dark:text-indigo-100">
               {selectedListing?.title}
@@ -447,16 +487,22 @@ const Explore = () => {
           <DialogFooter className="flex gap-3 mt-6">
             <Button
               variant="outline"
-              onClick={() => handleMessage(selectedListing.id)}
+              onClick={() => {
+                setShowDetailsModal(false);
+                handleMessage(selectedListing.id);
+              }}
               className="flex-1 border-indigo-600 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:border-indigo-400 dark:text-indigo-300 dark:hover:bg-indigo-600 dark:hover:text-white transition-colors duration-200"
             >
               Message Seller
             </Button>
             <Button
-              onClick={() => handleMakeDeal(selectedListing.id)}
+              onClick={() => {
+                setShowDetailsModal(false);
+                navigate(`/listing/${selectedListing.id}`);
+              }}
               className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
             >
-              Make a Deal
+              View Full Details
             </Button>
           </DialogFooter>
         </DialogContent>

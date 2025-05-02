@@ -1,15 +1,20 @@
-
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, User, Star, MessageSquare, ShoppingCart } from 'lucide-react';
-import Navbar from '@/components/Navbar';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, User, Star, MessageSquare, ShoppingCart } from "lucide-react";
+import Navbar from "@/components/Navbar";
 
 const ListingDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,11 +22,12 @@ const ListingDetails = () => {
   const { authState } = useAuth();
 
   const { data: listing, isLoading } = useQuery({
-    queryKey: ['listing', id],
+    queryKey: ["listing", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('listings')
-        .select(`
+        .from("listings")
+        .select(
+          `
           *,
           profiles:seller_id (
             id,
@@ -33,10 +39,11 @@ const ListingDetails = () => {
             image_url,
             is_primary
           )
-        `)
-        .eq('id', id)
+        `
+        )
+        .eq("id", id)
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -45,28 +52,28 @@ const ListingDetails = () => {
 
   const handleContactSeller = () => {
     if (!authState.user) {
-      toast.info('Please sign in to contact the seller');
-      navigate('/auth', { state: { returnTo: `/listing/${id}` } });
+      toast.info("Please sign in to contact the seller");
+      navigate("/auth", { state: { returnTo: `/listing/${id}` } });
       return;
     }
-    
-    if (authState.profile?.user_type !== 'customer') {
-      toast.info('Only customers can contact sellers');
+
+    if (authState.profile?.user_type !== "customer") {
+      toast.info("Only customers can contact sellers");
       return;
     }
-    
+
     navigate(`/contact/${id}`);
   };
 
   const handleBuyNow = () => {
     if (!authState.user) {
-      toast.info('Please sign in to purchase this item');
-      navigate('/auth', { state: { returnTo: `/listing/${id}` } });
+      toast.info("Please sign in to purchase this item");
+      navigate("/auth", { state: { returnTo: `/listing/${id}` } });
       return;
     }
 
-    if (authState.profile?.user_type !== 'customer') {
-      toast.info('Only customers can purchase items');
+    if (authState.profile?.user_type !== "customer") {
+      toast.info("Only customers can purchase items");
       return;
     }
 
@@ -95,7 +102,7 @@ const ListingDetails = () => {
             <CardContent className="pt-6">
               <p className="text-center">Listing not found</p>
               <div className="flex justify-center mt-4">
-                <Button onClick={() => navigate('/explore')}>
+                <Button onClick={() => navigate("/explore")}>
                   Back to Explore
                 </Button>
               </div>
@@ -107,9 +114,10 @@ const ListingDetails = () => {
   }
 
   // Find the primary image or use the first one
-  const primaryImage = listing.listing_images.find(img => img.is_primary) || 
-                        (listing.listing_images.length > 0 ? listing.listing_images[0] : null);
-  const imageUrl = primaryImage ? primaryImage.image_url : '/placeholder.svg';
+  const primaryImage =
+    listing.listing_images.find((img) => img.is_primary) ||
+    (listing.listing_images.length > 0 ? listing.listing_images[0] : null);
+  const imageUrl = primaryImage ? primaryImage.image_url : "/placeholder.svg";
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,7 +136,9 @@ const ListingDetails = () => {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-2xl mb-2">{listing.title}</CardTitle>
+                    <CardTitle className="text-2xl mb-2">
+                      {listing.title}
+                    </CardTitle>
                     <CardDescription className="flex items-center mb-2">
                       <MapPin className="h-4 w-4 mr-1" />
                       {listing.location}
@@ -150,26 +160,33 @@ const ListingDetails = () => {
                     <Star
                       key={i}
                       className={`h-5 w-5 ${
-                        i < (listing.rating || 0) 
-                          ? "text-solar-yellow fill-solar-yellow" 
+                        i < (listing.rating || 0)
+                          ? "text-solar-yellow fill-solar-yellow"
                           : "text-gray-300"
                       }`}
                     />
                   ))}
                 </div>
-                
+
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold mb-2">Description</h3>
-                  <p className="text-gray-700 whitespace-pre-line">{listing.description}</p>
+                  <p className="text-gray-700 whitespace-pre-line">
+                    {listing.description}
+                  </p>
                 </div>
-                
+
                 <div className="mt-6 space-y-4">
                   {listing.listing_images.length > 1 && (
                     <div>
-                      <h3 className="text-lg font-semibold mb-3">More Images</h3>
+                      <h3 className="text-lg font-semibold mb-3">
+                        More Images
+                      </h3>
                       <div className="grid grid-cols-3 gap-4">
                         {listing.listing_images.map((image, index) => (
-                          <div key={index} className="aspect-square overflow-hidden rounded-md">
+                          <div
+                            key={index}
+                            className="aspect-square overflow-hidden rounded-md"
+                          >
                             <img
                               src={image.image_url}
                               alt={`${listing.title} ${index + 1}`}
@@ -184,7 +201,7 @@ const ListingDetails = () => {
               </CardContent>
             </Card>
           </div>
-          
+
           <div>
             <Card>
               <CardHeader>
@@ -197,41 +214,40 @@ const ListingDetails = () => {
                   </div>
                   <div>
                     <p className="font-medium">
-                      {listing.profiles?.first_name} {listing.profiles?.last_name}
+                      {listing.profiles?.first_name}{" "}
+                      {listing.profiles?.last_name}
                     </p>
                     <p className="text-sm text-muted-foreground capitalize">
                       {listing.profiles?.user_type}
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
-                  {authState.user?.id !== listing.seller_id && authState.profile?.user_type === 'customer' && (
-                    <>
-                      <Button 
-                        className="w-full"
-                        onClick={handleBuyNow}
-                      >
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        Buy Now
-                      </Button>
-                      
-                      <Button 
-                        variant="outline"
-                        onClick={handleContactSeller} 
-                        className="w-full"
-                      >
-                        <MessageSquare className="mr-2 h-4 w-4" />
-                        Contact Seller
-                      </Button>
-                    </>
-                  )}
-                  
+                  {authState.user?.id !== listing.seller_id &&
+                    authState.profile?.user_type === "customer" && (
+                      <>
+                        <Button className="w-full" onClick={handleBuyNow}>
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Buy Now
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          onClick={handleContactSeller}
+                          className="w-full"
+                        >
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          Contact Seller
+                        </Button>
+                      </>
+                    )}
+
                   {authState.user?.id === listing.seller_id && (
-                    <Button 
-                      variant="outline" 
-                      className="w-full" 
-                      onClick={() => navigate('/seller/listings')}
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => navigate("/seller/listings")}
                     >
                       Manage Your Listings
                     </Button>
