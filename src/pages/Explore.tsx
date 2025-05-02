@@ -39,7 +39,7 @@ import {
 
 const Explore = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const [condition, setCondition] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
@@ -70,17 +70,23 @@ const Explore = () => {
 
   const filteredListings = listings
     .filter((listing) => {
-      if (
-        searchTerm &&
-        !listing.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !listing.location.toLowerCase().includes(searchTerm.toLowerCase())
-      ) {
-        return false;
+      if (searchTerm) {
+        // Convert all values to strings before comparison to prevent crashes
+        const titleMatch = String(listing.title)
+          .toLowerCase()
+          .includes(String(searchTerm).toLowerCase());
+        const locationMatch = String(listing.location)
+          .toLowerCase()
+          .includes(String(searchTerm).toLowerCase());
+
+        if (!titleMatch && !locationMatch) {
+          return false;
+        }
       }
 
       if (
         condition !== "all" &&
-        listing.condition.toLowerCase() !== condition.toLowerCase()
+        String(listing.condition).toLowerCase() !== condition.toLowerCase()
       ) {
         return false;
       }
@@ -101,7 +107,6 @@ const Explore = () => {
           );
       }
     });
-
   const handleViewDeal = (listing) => {
     navigate(`/listing/${listing.id}`);
   };
