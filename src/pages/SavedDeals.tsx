@@ -17,7 +17,7 @@ const SavedDeals = () => {
     queryKey: ["user-saved-listings", authState.user?.id],
     queryFn: async () => {
       if (!authState.user) return [];
-
+      
       const { data, error } = await supabase
         .from("saved_listings")
         .select(
