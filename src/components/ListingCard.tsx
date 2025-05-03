@@ -54,28 +54,6 @@ const ListingCard = ({
     navigate(`/listing/${id}`);
   };
 
-  // const handleSaveListing = async () => {
-  //   if (!authState.user) {
-  //     toast2.info("Please sign in to save listings");
-  //     return;
-  //   }
-  //   if (!saved) {
-  //     const { data, error } = await supabase
-  //       .from("saved_listings")
-  //       .upsert({ listing_id: id, user_id: authState.user.id })
-  //       .single();
-  //     if (error) throw error;
-  //     return data;
-  //   } else {
-  //     const { error } = await supabase
-  //       .from("saved_listings")
-  //       .delete()
-  //       .eq("listing_id", id)
-  //       .eq("user_id", authState.user.id);
-  //     if (error) throw error;
-  //   }
-  // };
-
   return (
     <div className="solar-card group cursor-pointer" onClick={handleViewDeal}>
       <div className="relative overflow-hidden">
