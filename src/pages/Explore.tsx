@@ -9,7 +9,7 @@ import ListingSection from "@/components/ui/Explore/LsitingSection";
 import FiltersSection from "@/components/ui/Explore/FiltersSection";
 import { Button } from "@/components/ui/button";
 
-const ITEMS_PER_PAGE = 50;
+const ITEMS_PER_PAGE = 100;
 
 const Explore = () => {
   const navigate = useNavigate();
