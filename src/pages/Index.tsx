@@ -1,4 +1,4 @@
-import { ArrowRight, Sun, Leaf, Zap } from "lucide-react";
+import { ArrowRight, Sun, Leaf, Zap, Battery, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -40,11 +40,36 @@ const Home = () => {
               </div>
             </div>
             <div className="relative hidden md:block">
-              <div className="aspect-square w-full max-w-md mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-full animate-float backdrop-blur-sm border border-white/10"></div>
+              <div className="aspect-square w-full max-w-md mx-auto relative">
+                {/* Improved bubble with solar-themed content */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-full animate-float backdrop-blur-sm border border-white/10 flex items-center justify-center overflow-hidden">
+                  {/* Center sun */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative w-1/3 h-1/3">
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-100 to-yellow-500 rounded-full animate-pulse shadow-lg shadow-yellow-400/50"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Sun className="text-white h-12 w-12" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Orbiting elements */}
+                  <div className="absolute inset-0 animate-spin-slow">
+                    <div className="absolute top-10 right-10">
+                      <PanelLeft className="h-8 w-8 text-blue-300" />
+                    </div>
+                    <div className="absolute bottom-16 left-16">
+                      <Battery className="h-8 w-8 text-green-300" />
+                    </div>
+                    <div className="absolute top-1/2 left-10">
+                      <Zap className="h-8 w-8 text-yellow-300" />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="absolute -top-6 -right-6 bg-white text-primary font-bold text-xl p-4 rounded-full shadow-lg">
-                Save 30%+
+              <div className="absolute -top-6 -right-6 bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 text-primary font-bold text-sm px-5 py-3 rounded-full shadow-lg flex items-center gap-2 animate-pulse ring-2 ring-white ring-offset-2">
+                <Zap className="h-5 w-5 text-primary" />
+                <span>Save 30%+</span>
               </div>
             </div>
           </div>
@@ -151,8 +176,7 @@ const Home = () => {
 
             <div className="relative group overflow-hidden rounded-lg h-64">
               <img
-                src="https://www.rei.com/dam/van_dragt_102517_0032_how_to_choose_batteries.jpg?t=ea16by9xs"
-                alt="Batteries"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr_D1kqvG9zijEIjc1qNsJ99tPnWMPBawEqQ&s"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
@@ -172,7 +196,7 @@ const Home = () => {
 
             <div className="relative group overflow-hidden rounded-lg h-64">
               <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr_D1kqvG9zijEIjc1qNsJ99tPnWMPBawEqQ&s"
+                src="https://www.rei.com/dam/van_dragt_102517_0032_how_to_choose_batteries.jpg?t=ea16by9xs"
                 alt="Inverters"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
