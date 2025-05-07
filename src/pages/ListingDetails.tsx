@@ -21,6 +21,7 @@ const ListingDetails = () => {
   const navigate = useNavigate();
   const { authState } = useAuth();
 
+  const [localRating, setLocalRating] = useState<number | null>(null);
   const { data: listing, isLoading } = useQuery({
     queryKey: ["listing", id],
     queryFn: async () => {
@@ -159,10 +160,33 @@ const ListingDetails = () => {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-5 w-5 ${
-                        i < (listing.rating || 0)
+                      onClick={async () => {
+                        if (!authState.user) {
+                          toast.info("Please sign in to rate this listing");
+                          navigate("/auth", {
+                            state: { returnTo: `/listing/${id}` },
+                          });
+                          return;
+                        }
+
+                        try {
+                          const { error } = await supabase
+                            .from("listings")
+                            .update({ rating: i + 1 })
+                            .eq("id", id);
+
+                          if (error) throw error;
+
+                          setLocalRating(i + 1);
+                          listing.rating = i + 1;
+                        } catch (error) {
+                          toast.error("Failed to submit rating");
+                        }
+                      }}
+                      className={`${
+                        i < ((localRating ?? listing.rating) || 0)
                           ? "text-solar-yellow fill-solar-yellow"
-                          : "text-gray-300"
+                          : "text-black-300"
                       }`}
                     />
                   ))}
