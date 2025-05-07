@@ -130,10 +130,8 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <p className="text-gray-300 mb-2">Email: info@wattshare.com</p>
-            <p className="text-gray-300 mb-2">Phone: (555) 123-4567</p>
-            <p className="text-gray-300">
-              Address: 123 Solar Street, Sunshine City, SC 12345
-            </p>
+            <p className="text-gray-300 mb-2">Phone: (+92)345-6789457</p>
+            <p className="text-gray-300">CR22 ,Rimms building Nust h12</p>
           </div>
         </div>
 

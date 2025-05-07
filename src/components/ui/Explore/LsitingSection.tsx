@@ -5,6 +5,7 @@ import { Button } from "../button";
 
 interface ListingSectionProps {
   filteredListings: any[];
+  totalCount?: number;
   viewMode: string;
   isLoading: boolean;
   condition: string;
@@ -13,11 +14,12 @@ interface ListingSectionProps {
   setSearchTerm: (searchTerm: string) => void;
   openDetailsModal: (listing: any) => void;
   handleViewDeal: (listing: any) => void;
-  updateRating: (listingId: string, newRating: number) => void;
+  updateRating?: (listingId: string, newRating: number) => void;
 }
 
 const ListingSection: React.FC<ListingSectionProps> = ({
   filteredListings,
+  totalCount,
   viewMode,
   isLoading,
   condition,
@@ -34,7 +36,9 @@ const ListingSection: React.FC<ListingSectionProps> = ({
 
   const handleStarClick = (listing: any, rating: number) => {
     // Call the parent function to update the rating in your data store
-    updateRating(listing.id, rating);
+    if (updateRating) {
+      updateRating(listing.id, rating);
+    }
   };
 
   const handleStarHover = (listingId: string, rating: number) => {
@@ -216,7 +220,8 @@ const ListingSection: React.FC<ListingSectionProps> = ({
           <p className="text-indigo-900 dark:text-indigo-200">
             Showing{" "}
             <span className="font-semibold text-indigo-700 dark:text-indigo-300">
-              {filteredListings.length}
+              {/* Use totalCount if available, otherwise fall back to filteredListings.length */}
+              {totalCount !== undefined ? totalCount : filteredListings.length}
             </span>{" "}
             results
             {condition !== "all" && (

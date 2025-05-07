@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DetailModal from "@/components/ui/Explore/DetailModal";
 import ListingSection from "@/components/ui/Explore/LsitingSection";
 import FiltersSection from "@/components/ui/Explore/FiltersSection";
-import { Button } from "@/components/ui/button"; // Assuming you have a Button component
+import { Button } from "@/components/ui/button";
+
+const ITEMS_PER_PAGE = 50;
 
 const Explore = () => {
   const navigate = useNavigate();
@@ -17,95 +19,160 @@ const Explore = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [selectedListing, setSelectedListing] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [page, setPage] = useState(1);
-  const [loadedListings, setLoadedListings] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Fetch all listings and paid deals
-  const { data: allListings = [], isLoading } = useQuery({
-    queryKey: ["listings"],
-    queryFn: async () => {
-      // Get all paid deals to identify sold listings
-      const { data: dealsData } = await supabase
-        .from("deals")
-        .select("listing_id")
-        .eq("status", "paid");
+  // Function to get filtered paid listing IDs
+  const getFilteredPaidListingIds = async () => {
+    const { data: dealsData } = await supabase
+      .from("deals")
+      .select("listing_id")
+      .eq("status", "paid");
 
-      const paidListingIds = dealsData?.map((deal) => deal.listing_id) || [];
+    return dealsData?.map((deal) => deal.listing_id) || [];
+  };
 
-      // Get all listings that are NOT in the paid deals list
-      const { data, error } = await supabase
-        .from("listings")
-        .select(
-          `
-          *,
-          listing_images (id, image_url, is_primary),
-          profiles:seller_id (first_name, last_name)
-        `
-        )
-        .not("id", "in", `(${paidListingIds.join(",")})`)
-        .order("created_at", { ascending: false });
+  // Function to get the total count of filtered listings
+  const fetchTotalCount = async () => {
+    const paidListingIds = await getFilteredPaidListingIds();
 
-      if (error) throw error;
-      return data || [];
-    },
+    // Build query for count only
+    let countQuery = supabase
+      .from("listings")
+      .select("id", { count: "exact" })
+      .not(
+        "id",
+        "in",
+        `(${paidListingIds.length ? paidListingIds.join(",") : "0"})`
+      );
+
+    // Apply filters
+    if (searchTerm) {
+      countQuery = countQuery.or(
+        `title.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`
+      );
+    }
+
+    if (condition !== "all") {
+      countQuery = countQuery.ilike("condition", condition);
+    }
+
+    const { count, error } = await countQuery;
+
+    if (error) throw error;
+    return count || 0;
+  };
+
+  // Separate query for the total count
+  const { data: totalCount = 0, refetch: refetchCount } = useQuery({
+    queryKey: ["listingsCount", searchTerm, condition],
+    queryFn: fetchTotalCount,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Filter and sort logic
-  const getFilteredListings = () => {
-    return allListings
-      .filter((listing) => {
-        if (searchTerm) {
-          const titleMatch = String(listing.title)
-            .toLowerCase()
-            .includes(String(searchTerm).toLowerCase());
-          const locationMatch = String(listing.location)
-            .toLowerCase()
-            .includes(String(searchTerm).toLowerCase());
+  // Function to fetch paginated listings from Supabase
+  const fetchListings = async ({ pageParam = 0 }) => {
+    // Get all paid deals to identify sold listings
+    const paidListingIds = await getFilteredPaidListingIds();
 
-          if (!titleMatch && !locationMatch) {
-            return false;
-          }
-        }
+    // Build initial query
+    let query = supabase
+      .from("listings")
+      .select(
+        `
+        *,
+        listing_images (id, image_url, is_primary),
+        profiles:seller_id (first_name, last_name)
+      `
+      )
+      .not(
+        "id",
+        "in",
+        `(${paidListingIds.length ? paidListingIds.join(",") : "0"})`
+      )
+      .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1);
 
-        if (
-          condition !== "all" &&
-          String(listing.condition).toLowerCase() !== condition.toLowerCase()
-        ) {
-          return false;
-        }
+    // Apply filters if they exist
+    if (searchTerm) {
+      query = query.or(
+        `title.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`
+      );
+    }
 
-        return true;
-      })
-      .sort((a, b) => {
-        switch (sortBy) {
-          case "price_low":
-            return a.price - b.price;
-          case "price_high":
-            return b.price - a.price;
-          case "rating":
-            return (b.rating || 0) - (a.rating || 0);
-          default:
-            return (
-              new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            );
-        }
-      });
+    if (condition !== "all") {
+      query = query.ilike("condition", condition);
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case "price_low":
+        query = query.order("price", { ascending: true });
+        break;
+      case "price_high":
+        query = query.order("price", { ascending: false });
+        break;
+      case "rating":
+        query = query.order("rating", { ascending: false });
+        break;
+      default:
+        query = query.order("created_at", { ascending: false });
+        break;
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      nextPage: data?.length === ITEMS_PER_PAGE ? pageParam + 1 : undefined,
+    };
   };
 
-  // Pagination effect
+  // Use React Query's useInfiniteQuery for pagination
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ["listings", searchTerm, condition, sortBy],
+    queryFn: fetchListings,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 0,
+  });
+
+  // Flattened listings from all pages
+  const allLoadedListings = data?.pages.flatMap((page) => page.data) || [];
+
+  // Refetch when filters change
   useEffect(() => {
-    const filtered = getFilteredListings();
-    const itemsPerLoad = page === 1 ? 150 : 100;
-    const endIndex = Math.min(page * itemsPerLoad, filtered.length);
-    
-    setLoadedListings(filtered.slice(0, endIndex));
-    setHasMore(endIndex < filtered.length);
-  }, [page, allListings, searchTerm, condition, sortBy]);
+    refetch();
+    refetchCount();
+  }, [searchTerm, condition, sortBy, refetch, refetchCount]);
 
-  const handleLoadMore = () => {
-    setPage(prev => prev + 1);
-  };
+  // Intersection Observer for infinite scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleViewDeal = (listing) => {
     navigate(`/listing/${listing.id}`);
@@ -142,20 +209,21 @@ const Explore = () => {
       </section>
 
       {/* Filters section */}
-      <FiltersSection 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-        condition={condition} 
-        setCondition={setCondition} 
-        sortBy={sortBy} 
-        setSortBy={setSortBy} 
-        viewMode={viewMode} 
-        setViewMode={setViewMode} 
+      <FiltersSection
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        condition={condition}
+        setCondition={setCondition}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
 
       {/* Listings section */}
       <ListingSection
-        filteredListings={loadedListings}
+        filteredListings={allLoadedListings}
+        totalCount={totalCount}
         viewMode={viewMode}
         isLoading={isLoading}
         condition={condition}
@@ -166,18 +234,25 @@ const Explore = () => {
         handleViewDeal={handleViewDeal}
       />
 
-      {/* Load More button */}
-      {hasMore && !isLoading && (
-        <div className="flex justify-center my-8">
-          <Button 
-            onClick={handleLoadMore}
+      {/* Load More section - this div is used for intersection observer */}
+      <div ref={loadMoreRef} className="flex justify-center my-8">
+        {isFetchingNextPage ? (
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+            <span className="ml-2 text-gray-600">Loading more listings...</span>
+          </div>
+        ) : hasNextPage ? (
+          <Button
+            onClick={() => fetchNextPage()}
             className="px-8 py-4 text-lg"
             variant="outline"
           >
             Load More
           </Button>
-        </div>
-      )}
+        ) : allLoadedListings.length > 0 ? (
+          <span className="text-gray-500">All listings loaded</span>
+        ) : null}
+      </div>
 
       {/* Details Modal */}
       <DetailModal
