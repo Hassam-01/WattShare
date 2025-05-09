@@ -113,7 +113,7 @@ const ListingSection: React.FC<ListingSectionProps> = ({
             <MapPin className="h-4 w-4 mr-1" />
             <span className="text-sm">{listing.location}</span>
           </div>
-          <div className="flex items-center mb-3">{renderStars(listing)}</div>
+          {/*<div className="flex items-center mb-3">{renderStars(listing)}</div>*/}
           <div className="pt-4 border-t border-indigo-100 dark:border-indigo-800/30 mt-4 flex items-center justify-between">
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700 dark:from-indigo-400 dark:to-purple-400">
               ${listing.price.toLocaleString()}
