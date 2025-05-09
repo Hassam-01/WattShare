@@ -37,7 +37,7 @@ const teamMembers = [
     name: "Shahzaib",
     role: "Marketing Lead",
     description: "Dedicated to spreading awareness about solar energy.",
-    image: "/api/placeholder/150/150",
+    image: "https://i.ibb.co/jkC1Nc4H/Me.jpg",
   },
 ];
 
