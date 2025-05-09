@@ -34,30 +34,27 @@ const Explore = () => {
   // Function to get the total count of filtered listings
   const fetchTotalCount = async () => {
     const paidListingIds = await getFilteredPaidListingIds();
-
-    // Build query for count only
-    let countQuery = supabase
-      .from("listings")
-      .select("id", { count: "exact" })
-      .not(
-        "id",
-        "in",
-        `(${paidListingIds.length ? paidListingIds.join(",") : "0"})`
-      );
-
+  
+    let countQuery = supabase.from("listings").select("id", { count: "exact" });
+  
+    // Exclude paid listings only if there are any
+    if (paidListingIds.length > 0) {
+      countQuery = countQuery.not("id", "in", `(${paidListingIds.join(",")})`);
+    }
+  
     // Apply filters
     if (searchTerm) {
       countQuery = countQuery.or(
         `title.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`
       );
     }
-
+  
     if (condition !== "all") {
       countQuery = countQuery.ilike("condition", condition);
     }
-
+  
     const { count, error } = await countQuery;
-
+  
     if (error) throw error;
     return count || 0;
   };
@@ -71,10 +68,8 @@ const Explore = () => {
 
   // Function to fetch paginated listings from Supabase
   const fetchListings = async ({ pageParam = 0 }) => {
-    // Get all paid deals to identify sold listings
     const paidListingIds = await getFilteredPaidListingIds();
-
-    // Build initial query
+  
     let query = supabase
       .from("listings")
       .select(
@@ -84,24 +79,24 @@ const Explore = () => {
         profiles:seller_id (first_name, last_name)
       `
       )
-      .not(
-        "id",
-        "in",
-        `(${paidListingIds.length ? paidListingIds.join(",") : "0"})`
-      )
       .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1);
-
-    // Apply filters if they exist
+  
+    // Exclude paid listings only if there are any
+    if (paidListingIds.length > 0) {
+      query = query.not("id", "in", `(${paidListingIds.join(",")})`);
+    }
+  
+    // Apply filters
     if (searchTerm) {
       query = query.or(
         `title.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`
       );
     }
-
+  
     if (condition !== "all") {
       query = query.ilike("condition", condition);
     }
-
+  
     // Apply sorting
     switch (sortBy) {
       case "price_low":
@@ -117,17 +112,17 @@ const Explore = () => {
         query = query.order("created_at", { ascending: false });
         break;
     }
-
+  
     const { data, error } = await query;
-
+  
     if (error) throw error;
-
+  
     return {
       data: data || [],
       nextPage: data?.length === ITEMS_PER_PAGE ? pageParam + 1 : undefined,
     };
   };
-
+  
   // Use React Query's useInfiniteQuery for pagination
   const {
     data,
