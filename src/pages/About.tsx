@@ -35,14 +35,15 @@ const teamMembers = [
   {
     id: 3,
     name: "Shahzaib",
-    role: "Marketing Lead",
-    description: "Dedicated to spreading awareness about solar energy.",
+    role: "MVP (Most Valuable Procrastinator)",
+    description: "Leads with vibes, delivers under pressure (usually self-inflicted). Master of last-minute brilliance and coffee-fueled innovation.",
     image: "https://i.ibb.co/jkC1Nc4H/Me.jpg",
-  },
+  }
+
 ];
 
 const AboutUs = () => {
-  const { theme} = useTheme();
+  const { theme } = useTheme();
 
   useEffect(() => {
     // Apply theme class to document body
@@ -330,7 +331,7 @@ const AboutUs = () => {
         </div>
       </section>
 
-     <ContactSection/>
+      <ContactSection />
 
       <Footer />
     </div>
