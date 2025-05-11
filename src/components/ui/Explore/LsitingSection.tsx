@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, MapPin, Star } from "lucide-react";
 import { Badge } from "../badge";
 import { Button } from "../button";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { supabase } from "@/integrations/supabase/client";
+
 
 interface ListingSectionProps {
   filteredListings: any[];
@@ -34,6 +37,83 @@ const ListingSection: React.FC<ListingSectionProps> = ({
     {}
   );
 
+  const [savedListings, setSavedListings] = useState<Set<string>>(new Set());
+
+  const toggleSaveListing = async (listingId: string) => {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        console.error("User not authenticated");
+        return;
+      }
+
+      const isAlreadySaved = savedListings.has(listingId);
+
+      if (isAlreadySaved) {
+        // UNSAVE: Remove from Supabase
+        const { error } = await supabase
+          .from("saved_listings")
+          .delete()
+          .match({ user_id: user.id, listing_id: listingId });
+
+        if (error) {
+          console.error("Error unsaving listing:", error.message);
+          return;
+        }
+
+        setSavedListings((prev) => {
+          const updated = new Set(prev);
+          updated.delete(listingId);
+          return updated;
+        });
+      } else {
+        // SAVE: Add to Supabase
+        const { error } = await supabase.from("saved_listings").insert([
+          {
+            user_id: user.id,
+            listing_id: listingId,
+          },
+        ]);
+
+        if (error) {
+          console.error("Error saving listing:", error.message);
+          return;
+        }
+
+        setSavedListings((prev) => new Set(prev).add(listingId));
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    }
+  };
+
+
+
+  // Inside your component, after the useState declarations:
+
+  useEffect(() => {
+    const fetchSavedListings = async () => {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("saved_listings")
+        .select("listing_id")
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Error fetching saved listings:", error.message);
+        return;
+      }
+
+      const savedIds = new Set(data.map((item) => item.listing_id));
+      setSavedListings(savedIds);
+    };
+
+    fetchSavedListings();
+  }, []);
+
+
   const handleStarClick = (listing: any, rating: number) => {
     // Call the parent function to update the rating in your data store
     if (updateRating) {
@@ -65,11 +145,10 @@ const ListingSection: React.FC<ListingSectionProps> = ({
       return (
         <Star
           key={i}
-          className={`h-4 w-4 cursor-pointer ${
-            isFilled
-              ? "text-amber-400 fill-amber-400"
-              : "text-gray-300 dark:text-gray-600"
-          }`}
+          className={`h-4 w-4 cursor-pointer ${isFilled
+            ? "text-amber-400 fill-amber-400"
+            : "text-gray-300 dark:text-gray-600"
+            }`}
           onClick={() => handleStarClick(listing, starValue)}
           onMouseEnter={() => handleStarHover(listing.id, starValue)}
           onMouseLeave={() => handleStarLeave(listing.id)}
@@ -93,6 +172,32 @@ const ListingSection: React.FC<ListingSectionProps> = ({
           className="h-48 overflow-hidden relative"
           onClick={() => openDetailsModal(listing)}
         >
+          <div className="rounded-md absolute top-2 right-2 z-10">
+            {savedListings.has(listing.id) ? (
+              <FaBookmark
+                size={24}
+                color="black"
+                className="cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleSaveListing(listing.id);
+                }}
+              />
+
+            ) : (
+              <FaRegBookmark
+                size={24}
+                color="black"
+                className="cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleSaveListing(listing.id);
+                }}
+              />
+
+            )}
+          </div>
+
           <img
             src={listing.listing_images?.[0]?.image_url || "/placeholder.svg"}
             alt={listing.title}
