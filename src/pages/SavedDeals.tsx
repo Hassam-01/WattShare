@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ListingCard from "@/components/ListingCard";
 import Navbar from "@/components/Navbar";
@@ -12,40 +11,92 @@ import { Package } from "lucide-react";
 const SavedDeals = () => {
   const { authState } = useAuth();
   const navigate = useNavigate();
+  const [savedListings, setSavedListings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { data: savedListings, isLoading, error } = useQuery({
-    queryKey: ["user-saved-listings", authState.user?.id],
-    queryFn: async () => {
-      if (!authState.user) return [];
-      
-      const { data, error } = await supabase
-        .from("saved_listings")
-        .select(
-          `
-          id,
-          listings (
-            id,
-            title,
-            price,
-            location,
-            condition,
-            rating,
-            listing_images (
-              image_url,
-              is_primary
-            )
-          )
-        `
-        )
-        .eq("user_id", authState.user.id);
+  useEffect(() => {
+    const fetchSavedListings = async () => {
+      if (!authState.user?.id) return;
 
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!authState.user?.id,
-  });
+      try {
+        console.log("Fetching saved listings for user:", authState.user.id);
+        const { data: saved, error: savedError } = await supabase
+          .from("saved_listings")
+          .select("listing_id")
+          .eq("user_id", authState.user.id);
 
-  if (isLoading) {
+        if (savedError) throw savedError;
+        console.log("Saved listings:", saved);
+
+        const fullListings = [];
+
+        for (const item of saved || []) {
+          const listingId = item.listing_id;
+
+          // Fetch listing details
+          const { data: listing, error: listingError } = await supabase
+            .from("listings")
+            .select("*")
+            .eq("id", listingId)
+            .single();
+          if (listingError) throw listingError;
+          console.log("Listing data:", listing);
+
+          // Fetch images
+          const { data: images, error: imagesError } = await supabase
+            .from("listing_images")
+            .select("*")
+            .eq("listing_id", listingId);
+          if (imagesError) throw imagesError;
+          console.log("Images:", images);
+
+          // Fetch address
+          // const { data: address, error: addressError } = await supabase
+          //   .from("address")
+          //   .select("*")
+          //   .eq("id", listing.address_id)
+          //   .single();
+          // if (addressError) throw addressError;
+          // console.log("Address:", address);
+
+          // // Fetch city
+          // const { data: city, error: cityError } = await supabase
+          //   .from("city")
+          //   .select("*")
+          //   .eq("id", address.city_id)
+          //   .single();
+          // if (cityError) throw cityError;
+          // console.log("City:", city);
+
+          fullListings.push({
+            id: listing.id,
+            title: listing.title,
+            price: listing.price,
+            condition: listing.condition,
+            rating: listing.rating,
+            listing_images: images,
+            // address: {
+            //   address: address.address,
+            //   city: {
+            //     city_name: city.,
+            //     province: city.province,
+            //   },
+            // },
+          });
+        }
+
+        setSavedListings(fullListings);
+      } catch (error) {
+        console.error("Error fetching saved listings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSavedListings();
+  }, [authState.user?.id]);
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -64,13 +115,15 @@ const SavedDeals = () => {
 
         {savedListings && savedListings.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {savedListings.map((savedListing) => {
-              const listing = savedListing.listings;
+            {savedListings.map((listing) => {
+              const city = listing.address?.city?.city_name || "";
+              const province = listing.address?.city?.province || "";
+              const location = [city, province].filter(Boolean).join(", ");
+
               const primaryImage =
-                listing.listing_images.find((img) => img.is_primary) ||
-                (listing.listing_images.length > 0
-                  ? listing.listing_images[0]
-                  : null);
+                listing.listing_images?.find((img) => img.is_primary) ||
+                listing.listing_images?.[0] ||
+                null;
 
               return (
                 <ListingCard
@@ -78,7 +131,7 @@ const SavedDeals = () => {
                   id={listing.id}
                   title={listing.title}
                   price={listing.price}
-                  location={listing.location}
+                  location={location}
                   image={primaryImage?.image_url || "/placeholder.svg"}
                   condition={listing.condition}
                   rating={listing.rating || 0}
