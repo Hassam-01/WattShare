@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,18 +8,19 @@ import DetailModal from "@/components/ui/Explore/DetailModal";
 import ListingSection from "@/components/ui/Explore/LsitingSection";
 import FiltersSection from "@/components/ui/Explore/FiltersSection";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
-const ITEMS_PER_PAGE = 100;
+const ITEMS_PER_PAGE = 25;
 
 const Explore = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [condition, setCondition] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState("grid");
   const [selectedListing, setSelectedListing] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [currentPage, setCurrentPage] = useState(0);
 
   // Function to get filtered paid listing IDs
   const getFilteredPaidListingIds = async () => {
@@ -67,8 +68,12 @@ const Explore = () => {
   });
 
   // Function to fetch paginated listings from Supabase
-  const fetchListings = async ({ pageParam = 0 }) => {
+  const fetchListings = async () => {
     const paidListingIds = await getFilteredPaidListingIds();
+    
+    // Calculate range for current page
+    const start = currentPage * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE - 1;
   
     let query = supabase
       .from("listings")
@@ -79,7 +84,7 @@ const Explore = () => {
         profiles:seller_id (first_name, last_name)
       `
       )
-      .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1);
+      .range(start, end);
   
     // Exclude paid listings only if there are any
     if (paidListingIds.length > 0) {
@@ -116,58 +121,30 @@ const Explore = () => {
     const { data, error } = await query;
   
     if (error) throw error;
-  
-    return {
-      data: data || [],
-      nextPage: data?.length === ITEMS_PER_PAGE ? pageParam + 1 : undefined,
-    };
+    return data || [];
   };
   
-  // Use React Query's useInfiniteQuery for pagination
+  // Use React Query for data fetching
   const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
+    data: listings = [],
     isLoading,
     refetch,
-  } = useInfiniteQuery({
-    queryKey: ["listings", searchTerm, condition, sortBy],
+  } = useQuery({
+    queryKey: ["listings", searchTerm, condition, sortBy, currentPage],
     queryFn: fetchListings,
-    getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: 0,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
-  // Flattened listings from all pages
-  const allLoadedListings = data?.pages.flatMap((page) => page.data) || [];
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchTerm, condition, sortBy]);
 
-  // Refetch when filters change
+  // Refetch when necessary
   useEffect(() => {
     refetch();
     refetchCount();
-  }, [searchTerm, condition, sortBy, refetch, refetchCount]);
-
-  // Intersection Observer for infinite scrolling
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [searchTerm, condition, sortBy, currentPage, refetch, refetchCount]);
 
   const handleViewDeal = (listing) => {
     navigate(`/listing/${listing.id}`);
@@ -184,6 +161,92 @@ const Explore = () => {
 
   const handleMakeDeal = (listingId) => {
     navigate(`/contact/${listingId}`);
+  };
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+  // Navigate to specific page
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    // Scroll to top when changing pages
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Function to render pagination numbers
+  const renderPaginationNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    // Logic to show appropriate page numbers
+    let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+    
+    // Adjust startPage if we're near the end
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(0, endPage - maxVisiblePages + 1);
+    }
+    
+    // First page
+    if (startPage > 0) {
+      pageNumbers.push(
+        <Button 
+          key="first" 
+          variant={0 === currentPage ? "default" : "outline"}
+          className="px-3 mx-1"
+          onClick={() => goToPage(0)}
+        >
+          1
+        </Button>
+      );
+      
+      // Ellipsis if needed
+      if (startPage > 1) {
+        pageNumbers.push(
+          <span key="ellipsis1" className="px-2">...</span>
+        );
+      }
+    }
+    
+    // Middle pages
+    for (let i = startPage; i <= endPage; i++) {
+      if (i === 0 && startPage === 0) continue; // Skip first page if already shown
+      if (i === totalPages - 1 && endPage === totalPages - 1) continue; // Skip last page if will be shown
+      
+      pageNumbers.push(
+        <Button 
+          key={i} 
+          variant={i === currentPage ? "default" : "outline"}
+          className="px-3 mx-1"
+          onClick={() => goToPage(i)}
+        >
+          {i + 1}
+        </Button>
+      );
+    }
+    
+    // Last page
+    if (endPage < totalPages - 1) {
+      // Ellipsis if needed
+      if (endPage < totalPages - 2) {
+        pageNumbers.push(
+          <span key="ellipsis2" className="px-2">...</span>
+        );
+      }
+      
+      pageNumbers.push(
+        <Button 
+          key="last" 
+          variant={totalPages - 1 === currentPage ? "default" : "outline"}
+          className="px-3 mx-1"
+          onClick={() => goToPage(totalPages - 1)}
+        >
+          {totalPages}
+        </Button>
+      );
+    }
+    
+    return pageNumbers;
   };
 
   return (
@@ -217,7 +280,7 @@ const Explore = () => {
 
       {/* Listings section */}
       <ListingSection
-        filteredListings={allLoadedListings}
+        filteredListings={listings}
         totalCount={totalCount}
         viewMode={viewMode}
         isLoading={isLoading}
@@ -229,25 +292,60 @@ const Explore = () => {
         handleViewDeal={handleViewDeal}
       />
 
-      {/* Load More section - this div is used for intersection observer */}
-      <div ref={loadMoreRef} className="flex justify-center my-8">
-        {isFetchingNextPage ? (
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-            <span className="ml-2 text-gray-600">Loading more listings...</span>
-          </div>
-        ) : hasNextPage ? (
+      {/* Pagination controls */}
+      {totalCount > 0 && (
+        <div className="flex flex-wrap justify-center items-center gap-2 my-8 px-4">
           <Button
-            onClick={() => fetchNextPage()}
-            className="px-8 py-4 text-lg"
+            onClick={() => goToPage(0)}
+            disabled={currentPage === 0}
             variant="outline"
+            className="flex items-center"
+            title="First Page"
           >
-            Load More
+            <ChevronsLeft className="h-4 w-4 mr-1" />
+            First
           </Button>
-        ) : allLoadedListings.length > 0 ? (
-          <span className="text-gray-500">All listings loaded</span>
-        ) : null}
-      </div>
+          
+          <Button
+            onClick={() => goToPage(Math.max(0, currentPage - 1))}
+            disabled={currentPage === 0}
+            variant="outline"
+            className="flex items-center"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Previous
+          </Button>
+          
+          <div className="flex items-center mx-2">
+            {renderPaginationNumbers()}
+          </div>
+          
+          <Button
+            onClick={() => goToPage(Math.min(totalPages - 1, currentPage + 1))}
+            disabled={currentPage >= totalPages - 1}
+            variant="outline"
+            className="flex items-center"
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+          
+          <Button
+            onClick={() => goToPage(totalPages - 1)}
+            disabled={currentPage >= totalPages - 1}
+            variant="outline"
+            className="flex items-center"
+            title="Last Page"
+          >
+            Last
+            <ChevronsRight className="h-4 w-4 ml-1" />
+          </Button>
+          
+          <div className="w-full text-center mt-2 text-sm text-gray-500">
+            Showing page {currentPage + 1} of {totalPages || 1} ({totalCount} listings)
+          </div>
+        </div>
+      )}
 
       {/* Details Modal */}
       <DetailModal
