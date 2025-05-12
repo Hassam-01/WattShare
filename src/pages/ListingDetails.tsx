@@ -146,17 +146,17 @@ const ListingDetails = () => {
                     </CardDescription>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-solar-darkblue mb-2">
+                    <div className="text-3xl font-bold text-blue-300 mb-2">
                       ${listing.price.toLocaleString()}
                     </div>
-                    <Badge variant="outline" className="bg-gray-100">
+                    <Badge variant="outline" className="bg-gray-100 dark:text-black">
                       {listing.condition}
                     </Badge>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center mb-6">
+                {/* <div className="flex items-center mb-6">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -190,7 +190,7 @@ const ListingDetails = () => {
                       }`}
                     />
                   ))}
-                </div>
+                </div> */}
 
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold mb-2">Description</h3>
