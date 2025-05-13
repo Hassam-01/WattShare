@@ -180,7 +180,7 @@ const Explore = () => {
     
     // Logic to show appropriate page numbers
     let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
     
     // Adjust startPage if we're near the end
     if (endPage - startPage + 1 < maxVisiblePages) {

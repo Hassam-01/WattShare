@@ -33,14 +33,28 @@ const ListingSection: React.FC<ListingSectionProps> = ({
   handleViewDeal,
   updateRating,
 }) => {
-  // Track hovered star ratings for each listing
-  const [hoveredRatings, setHoveredRatings] = useState<Record<string, number>>({});
-  
+
+  // images:
+  const images = [
+    "https://i.ibb.co/VcWC290Z/vivint-solar-ZEi-Fi-Os-V3-K4-unsplash.jpg",
+    "https://i.ibb.co/V06JY5bN/caspar-rae-b6v-Ai-N3w-YNw-unsplash.jpg",
+    "https://i.ibb.co/Lz86Qn5n/soren-h-1-PKAYe-A-n-Z4-unsplash.jpg",
+    "https://i.ibb.co/zHCDcVqy/vivint-solar-HASg-VRE48-KY-unsplash.jpg",
+    "https://i.ibb.co/mrHrGs6f/chirayu-trivedi-tw-OIx6-I35tk-unsplash.jpg",
+    "https://i.ibb.co/2mYmD8R/american-public-power-association-fm5-v-CUa-Bc-unsplash.jpghttps://i.ibb.co/2mYmD8R/american-public-power-association-fm5-v-CUa-Bc-unsplash.jpg",
+  ];
+    // Track hovered star ratings for each listing
+  const [hoveredRatings, setHoveredRatings] = useState<Record<string, number>>(
+    {}
+  );
+
   // Store saved listings in a Set for O(1) lookup performance
   const [savedListings, setSavedListings] = useState<Set<string>>(new Set());
-  
+
   // Prevent duplicate save/unsave operations with loading state
-  const [savingInProgress, setSavingInProgress] = useState<Set<string>>(new Set());
+  const [savingInProgress, setSavingInProgress] = useState<Set<string>>(
+    new Set()
+  );
 
   // Handle toggling save/unsave for a listing with optimistic UI updates
   const toggleSaveListing = async (listingId: string, e?: React.MouseEvent) => {
@@ -48,7 +62,7 @@ const ListingSection: React.FC<ListingSectionProps> = ({
     if (e) {
       e.stopPropagation();
     }
-    
+
     // Prevent duplicate requests
     if (savingInProgress.has(listingId)) {
       return;
@@ -56,7 +70,9 @@ const ListingSection: React.FC<ListingSectionProps> = ({
 
     try {
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         toast({
           title: "Authentication required",
@@ -67,12 +83,12 @@ const ListingSection: React.FC<ListingSectionProps> = ({
       }
 
       const isAlreadySaved = savedListings.has(listingId);
-      
+
       // Update UI optimistically
-      setSavingInProgress(prev => new Set(prev).add(listingId));
-      
+      setSavingInProgress((prev) => new Set(prev).add(listingId));
+
       // Update local state immediately for responsive UI
-      setSavedListings(prev => {
+      setSavedListings((prev) => {
         const updated = new Set(prev);
         if (isAlreadySaved) {
           updated.delete(listingId);
@@ -85,8 +101,8 @@ const ListingSection: React.FC<ListingSectionProps> = ({
       // Show toast notification
       toast({
         title: isAlreadySaved ? "Listing unsaved" : "Listing saved",
-        description: isAlreadySaved 
-          ? "The listing has been removed from your saved deals" 
+        description: isAlreadySaved
+          ? "The listing has been removed from your saved deals"
           : "The listing has been added to your saved deals",
         variant: "default",
       });
@@ -114,9 +130,9 @@ const ListingSection: React.FC<ListingSectionProps> = ({
       }
     } catch (error) {
       console.error("Error toggling saved status:", error);
-      
+
       // Revert optimistic update on error
-      setSavedListings(prev => {
+      setSavedListings((prev) => {
         const updated = new Set(prev);
         if (updated.has(listingId)) {
           updated.delete(listingId);
@@ -125,7 +141,7 @@ const ListingSection: React.FC<ListingSectionProps> = ({
         }
         return updated;
       });
-      
+
       // Show error toast
       toast({
         title: "Operation failed",
@@ -134,7 +150,7 @@ const ListingSection: React.FC<ListingSectionProps> = ({
       });
     } finally {
       // Clear loading state
-      setSavingInProgress(prev => {
+      setSavingInProgress((prev) => {
         const updated = new Set(prev);
         updated.delete(listingId);
         return updated;
@@ -146,7 +162,9 @@ const ListingSection: React.FC<ListingSectionProps> = ({
   useEffect(() => {
     const fetchSavedListings = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) return;
 
         const { data, error } = await supabase
@@ -223,7 +241,7 @@ const ListingSection: React.FC<ListingSectionProps> = ({
   const renderListCard = (listing: any) => {
     const isSaved = savedListings.has(listing.id);
     const isProcessing = savingInProgress.has(listing.id);
-    
+
     return (
       <div
         key={listing.id}
@@ -234,24 +252,30 @@ const ListingSection: React.FC<ListingSectionProps> = ({
             Sponsored
           </Badge>
         )}
-        <div className={`rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200 border border-indigo-100 dark:border-indigo-900/30 ${
-          isSaved ? "bg-amber-50 dark:bg-amber-900/10" : "bg-white dark:bg-gray-800"
-        }`}>
+        <div
+          className={`rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200 border border-indigo-100 dark:border-indigo-900/30 ${
+            isSaved
+              ? "bg-amber-50 dark:bg-amber-900/10"
+              : "bg-white dark:bg-gray-800"
+          }`}
+        >
           <div
             className="h-48 overflow-hidden relative"
             onClick={() => openDetailsModal(listing)}
           >
             {/* Bookmark icon with animation */}
-            <div 
-              className={`rounded-full p-2 ${isSaved ? "bg-yellow-200 " : " "} shadow-lg absolute top-2 right-2 z-10 transition-transform duration-150 hover:scale-110`}
+            <div
+              className={`rounded-full p-2 ${
+                isSaved ? "bg-yellow-200 " : " "
+              } shadow-lg absolute top-2 right-2 z-10 transition-transform duration-150 hover:scale-110`}
               onClick={(e) => toggleSaveListing(listing.id, e)}
             >
               {isSaved ? (
                 <FaBookmark
                   size={24}
                   className={`cursor-pointer ${
-                    isProcessing 
-                      ? "opacity-70" 
+                    isProcessing
+                      ? "opacity-70"
                       : "text-amber-500 dark:text-amber-400"
                   } transition-all duration-200`}
                 />
@@ -259,19 +283,26 @@ const ListingSection: React.FC<ListingSectionProps> = ({
                 <FaRegBookmark
                   size={24}
                   className={`cursor-pointer ${
-                    isProcessing 
-                      ? "opacity-70" 
+                    isProcessing
+                      ? "opacity-70"
                       : "text-gray-700 dark:text-gray-300 hover:text-amber-500 dark:hover:text-amber-400"
                   } transition-all duration-200`}
                 />
               )}
             </div>
 
+            {/* <img
+              // src={listing.listing_images?.[0]?.image_url || "/placeholder.svg"}
+              src={"https://source.unsplash.com/600x400/?solar,solar-panel,renewable-energy"}
+              alt={listing.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 cursor-pointer"
+            /> */}
             <img
-              src={listing.listing_images?.[0]?.image_url || "/placeholder.svg"}
+              src={images[Math.floor(Math.random() * images.length)]}
               alt={listing.title}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 cursor-pointer"
             />
+
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 flex items-center justify-center transition-all duration-300">
               <Eye className="text-white opacity-0 group-hover:opacity-100 h-8 w-8 transition-opacity duration-300" />
             </div>
@@ -322,7 +353,7 @@ const ListingSection: React.FC<ListingSectionProps> = ({
   const renderListItem = (listing: any) => {
     const isSaved = savedListings.has(listing.id);
     const isProcessing = savingInProgress.has(listing.id);
-    
+
     return (
       <div
         key={listing.id}
@@ -333,16 +364,20 @@ const ListingSection: React.FC<ListingSectionProps> = ({
             Sponsored
           </Badge>
         )}
-        <div className={`rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 overflow-hidden border border-indigo-100 dark:border-indigo-900/30 ${
-          isSaved ? "bg-amber-50 dark:bg-amber-900/10" : "bg-white dark:bg-gray-800"
-        }`}>
+        <div
+          className={`rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 overflow-hidden border border-indigo-100 dark:border-indigo-900/30 ${
+            isSaved
+              ? "bg-amber-50 dark:bg-amber-900/10"
+              : "bg-white dark:bg-gray-800"
+          }`}
+        >
           <div className="flex flex-col md:flex-row">
             <div
               className="w-full md:w-1/3 h-56 relative overflow-hidden cursor-pointer"
               onClick={() => openDetailsModal(listing)}
             >
               {/* Bookmark icon with animation */}
-              <div 
+              <div
                 className="rounded-md absolute top-2 right-2 z-10 transition-transform duration-150 hover:scale-110"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -353,8 +388,8 @@ const ListingSection: React.FC<ListingSectionProps> = ({
                   <FaBookmark
                     size={24}
                     className={`cursor-pointer ${
-                      isProcessing 
-                        ? "opacity-70" 
+                      isProcessing
+                        ? "opacity-70"
                         : "text-amber-500 dark:text-amber-400"
                     } transition-all duration-200`}
                   />
@@ -362,16 +397,18 @@ const ListingSection: React.FC<ListingSectionProps> = ({
                   <FaRegBookmark
                     size={24}
                     className={`cursor-pointer ${
-                      isProcessing 
-                        ? "opacity-70" 
+                      isProcessing
+                        ? "opacity-70"
                         : "text-gray-700 dark:text-gray-300 hover:text-amber-500 dark:hover:text-amber-400"
                     } transition-all duration-200`}
                   />
                 )}
               </div>
-              
+
               <img
-                src={listing.listing_images?.[0]?.image_url || "/placeholder.svg"}
+                src={
+                  listing.listing_images?.[0]?.image_url || "/placeholder.svg"
+                }
                 alt={listing.title}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />

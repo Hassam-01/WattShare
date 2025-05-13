@@ -58,18 +58,20 @@ const ListingCard = ({
     <div className="solar-card group cursor-pointer" onClick={handleViewDeal}>
       <div className="relative overflow-hidden">
         <img
-          src={image}
+          src={
+    "https://source.unsplash.com/600x400/?solar"
+          }
           alt={title}
           className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute top-2 right-2">
           <button
-            onClick={toggleSave}
-            className={`p-2 rounded-full ${
-              saved ? "bg-solar-yellow text-black" : "bg-white text-gray-500"
-            } hover:scale-105 transition-all`}
+        onClick={toggleSave}
+        className={`p-2 rounded-full ${
+          saved ? "bg-solar-yellow text-black" : "bg-white text-gray-500"
+        } hover:scale-105 transition-all`}
           >
-            <Bookmark className="h-5 w-5" />
+        <Bookmark className="h-5 w-5" />
           </button>
         </div>
         <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded text-sm font-medium">
