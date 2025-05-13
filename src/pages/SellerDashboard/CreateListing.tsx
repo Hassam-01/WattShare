@@ -61,6 +61,7 @@ const CreateListing = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log("Form values:", values);
     if (!authState.user) {
       toast.error("You must be logged in to create a listing");
       return;
@@ -78,13 +79,13 @@ const CreateListing = () => {
           description: values.description,
           price: values.price,
           condition: values.condition,
-          location: values.location,
+          address_id: 1,
           seller_id: authState.user.id,
           rating: 0,
         })
         .select()
         .single();
-
+        console.log("Listing created:", listing);
       if (listingError) throw listingError;
 
       // Add images if provided

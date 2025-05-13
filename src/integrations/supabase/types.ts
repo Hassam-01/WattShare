@@ -100,12 +100,12 @@ export type Database = {
           description: string
           id: string
           is_sponsored: boolean | null
-          location: string
           price: number
           rating: number | null
           seller_id: string
           title: string
           updated_at: string
+          address_id: number | null
         }
         Insert: {
           condition: string
@@ -113,12 +113,12 @@ export type Database = {
           description: string
           id?: string
           is_sponsored?: boolean | null
-          location: string
           price: number
           rating?: number | null
           seller_id: string
           title: string
           updated_at?: string
+          address_id: number | null
         }
         Update: {
           condition?: string
@@ -126,12 +126,12 @@ export type Database = {
           description?: string
           id?: string
           is_sponsored?: boolean | null
-          location?: string
           price?: number
           rating?: number | null
           seller_id?: string
           title?: string
           updated_at?: string
+          address_id?: number | null
         }
         Relationships: [
           {
