@@ -250,7 +250,7 @@ const Messages = () => {
                           }
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          ${deal.listings.price} • {deal.status}
+                          Rs.{deal.listings.price} • {deal.status}
                         </div>
                       </div>
                     ))}

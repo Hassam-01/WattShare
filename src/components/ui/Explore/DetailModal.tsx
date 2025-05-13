@@ -48,7 +48,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
                     Price:
                   </span>
                   <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700 dark:from-indigo-400 dark:to-purple-400">
-                    ${listing?.price?.toLocaleString()}
+                    Rs.{listing?.price?.toLocaleString()}
                   </span>
                 </p>
                 <p className="flex justify-between border-b border-indigo-100 dark:border-indigo-800/30 pb-2">

@@ -132,7 +132,7 @@ const Payment = () => {
           deal_id: dealId,
           sender_id: authState.user.id,
           receiver_id: listing.seller_id,
-          content: `I've completed the payment for ${listing.title} at $${listing.price}. Looking forward to receiving it!`
+          content: `I've completed the payment for ${listing.title} at Rs.${listing.price}. Looking forward to receiving it!`
         });
       
       if (messageError) throw messageError;
@@ -211,7 +211,7 @@ const Payment = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xl font-semibold">${listing.price}</div>
+                  <div className="text-xl font-semibold">Rs.{listing.price}</div>
                 </div>
               </div>
             </CardContent>
@@ -259,7 +259,7 @@ const Payment = () => {
                     Processing...
                   </>
                 ) : (
-                  `Pay $${listing.price}`
+                  `Pay Rs.${listing.price}`
                 )}
               </Button>
             </CardFooter>

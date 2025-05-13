@@ -147,7 +147,7 @@ const ListingDetails = () => {
                   </div>
                   <div>
                     <div className="text-3xl font-bold text-solar-darkblue mb-2">
-                      ${listing.price.toLocaleString()}
+                      Rs.{listing.price.toLocaleString()}
                     </div>
                     <Badge variant="outline" className="bg-gray-100">
                       {listing.condition}

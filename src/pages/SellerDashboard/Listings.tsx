@@ -61,7 +61,7 @@ const Listings = () => {
             <Card key={listing.id}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">{listing.title}</CardTitle>
-                <CardDescription>${listing.price}</CardDescription>
+                <CardDescription>Rs.{listing.price}</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-500 mb-4 line-clamp-2">{listing.description}</p>

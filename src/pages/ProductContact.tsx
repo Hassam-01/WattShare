@@ -153,7 +153,7 @@ const ProductContact = () => {
           <CardHeader>
             <CardTitle className="text-2xl">Contact Seller</CardTitle>
             <CardDescription>
-              You're interested in: <span className="font-semibold">{listing.title}</span> (${listing.price})
+              You're interested in: <span className="font-semibold">{listing.title}</span> (Rs.{listing.price})
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

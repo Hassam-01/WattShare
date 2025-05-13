@@ -59,7 +59,9 @@ const ListingCard = ({
       <div className="relative overflow-hidden">
         <img
           src={
-    "https://source.unsplash.com/600x400/?solar"
+        image
+          ? image
+          : "https://source.unsplash.com/600x400/?solar,solar-panel,renewable-energy"
           }
           alt={title}
           className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
@@ -98,7 +100,7 @@ const ListingCard = ({
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xl font-bold text-solar-darkblue">
-            ${price.toLocaleString()}
+            Rs.{price.toLocaleString()}
           </span>
           <Button
             variant="outline"
