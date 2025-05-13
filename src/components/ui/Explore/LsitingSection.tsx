@@ -406,9 +406,10 @@ const ListingSection: React.FC<ListingSectionProps> = ({
               </div>
 
               <img
-                src={
-                  listing.listing_images?.[0]?.image_url || "/placeholder.svg"
-                }
+                // src={
+                //   listing.listing_images?.[0]?.image_url || "/placeholder.svg"asdasds
+                // }
+                src={images[Math.floor(Math.random() * images.length)]}
                 alt={listing.title}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
